@@ -5886,13 +5886,17 @@ Nie, nie lękam się i śpiewam chwały pieśń.` }
   let autoscrollActive = false;
   let autoscrollRAF = null;
   let autoscrollLastTs = null;
+  let autoscrollPos = 0; // our own float tracker - songBodyWrap.scrollTop itself rounds to whole
+                          // pixels, so accumulating fractional px directly on it loses the
+                          // remainder every frame at low speeds and stalls completely.
 
   function autoscrollStep(ts){
     if(!autoscrollActive) return;
     if(autoscrollLastTs === null) autoscrollLastTs = ts;
     const dtSec = Math.min(0.25, (ts - autoscrollLastTs) / 1000); // clamp to avoid a huge jump after a tab was backgrounded
     autoscrollLastTs = ts;
-    songBodyWrap.scrollTop += autoscrollSpeed * AUTOSCROLL_PX_PER_LEVEL * dtSec;
+    autoscrollPos += autoscrollSpeed * AUTOSCROLL_PX_PER_LEVEL * dtSec;
+    songBodyWrap.scrollTop = autoscrollPos;
     if(songBodyWrap.scrollTop + songBodyWrap.clientHeight >= songBodyWrap.scrollHeight - 1){
       stopAutoscroll(); // reached the bottom - stop instead of idling
       return;
@@ -5906,6 +5910,7 @@ Nie, nie lękam się i śpiewam chwały pieśń.` }
     if(songBodyWrap.scrollTop + songBodyWrap.clientHeight >= songBodyWrap.scrollHeight - 1) return;
     autoscrollActive = true;
     autoscrollLastTs = null;
+    autoscrollPos = songBodyWrap.scrollTop; // resync in case the person manually scrolled since the last pause
     autoscrollPlayBtn.textContent = '⏸ Stop';
     autoscrollPlayBtn.classList.add('playing');
     autoscrollRAF = requestAnimationFrame(autoscrollStep);
