@@ -540,10 +540,11 @@
 
 <script type="module">
   // ---------- Firebase (cross-device setlist sync) ----------
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-
+  // Loaded lazily and defensively: this is an OPTIONAL feature (cloud sync of
+  // setlists). If the network/CDN/firewall blocks it, the whole app used to
+  // fail to start (a failed static `import` aborts the entire module, taking
+  // the song list and everything else down with it). Now a Firebase failure
+  // only disables sync - songs, setlists, metronome, autoscroll, etc. keep working.
   const firebaseConfig = {
     apiKey: "AIzaSyADWqBD7BHltXrtEPq5nzcQPXbj_EFb1ME",
     authDomain: "spiewnik-adonaj.firebaseapp.com",
@@ -553,17 +554,49 @@
     appId: "1:1057517558031:web:74614b50afe7ff7180867a"
   };
 
-  const fbApp = initializeApp(firebaseConfig);
-  const fbAuth = getAuth(fbApp);
-  const fbDb = getFirestore(fbApp);
+  let fbApp = null, fbAuth = null, fbDb = null, fbApi = null;
+  let firebaseLoadPromise = null;
+
+  function loadFirebase(){
+    if(!firebaseLoadPromise){
+      firebaseLoadPromise = (async () => {
+        try {
+          const [appMod, authMod, storeMod] = await Promise.all([
+            import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+            import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+            import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
+          ]);
+          fbApp = appMod.initializeApp(firebaseConfig);
+          fbAuth = authMod.getAuth(fbApp);
+          fbDb = storeMod.getFirestore(fbApp);
+          fbApi = {
+            signInAnonymously: authMod.signInAnonymously,
+            onAuthStateChanged: authMod.onAuthStateChanged,
+            doc: storeMod.doc,
+            setDoc: storeMod.setDoc,
+            getDoc: storeMod.getDoc,
+            onSnapshot: storeMod.onSnapshot
+          };
+          return true;
+        } catch(e){
+          console.warn('Synchronizacja w chmurze niedostępna (Firebase nie załadował się):', e);
+          return false;
+        }
+      })();
+    }
+    return firebaseLoadPromise;
+  }
 
   let authReadyPromise = null;
   function ensureAuth(){
     if(!authReadyPromise){
-      authReadyPromise = new Promise((resolve) => {
-        onAuthStateChanged(fbAuth, user => {
-          if(user) resolve(user);
-          else signInAnonymously(fbAuth).catch(() => resolve(null));
+      authReadyPromise = loadFirebase().then(ok => {
+        if(!ok) return null;
+        return new Promise((resolve) => {
+          fbApi.onAuthStateChanged(fbAuth, user => {
+            if(user) resolve(user);
+            else fbApi.signInAnonymously(fbAuth).catch(() => resolve(null));
+          });
         });
       });
     }
@@ -577,20 +610,22 @@
   let syncUnsub = null;
 
   async function connectSync(code, onRemoteUpdate){
+    const ok = await loadFirebase();
+    if(!ok) throw new Error('Synchronizacja w chmurze jest niedostępna - sprawdź połączenie z internetem.');
     if(syncUnsub){ syncUnsub(); syncUnsub = null; }
     localStorage.setItem('spiewnik_sync_code', code);
     await ensureAuth();
-    const ref = doc(fbDb, 'syncs', code);
-    const snap = await getDoc(ref);
+    const ref = fbApi.doc(fbDb, 'syncs', code);
+    const snap = await fbApi.getDoc(ref);
     if(snap.exists()){
       const remote = (snap.data() && snap.data().playlists) || [];
       localStorage.setItem('spiewnik_playlists', JSON.stringify(remote));
       onRemoteUpdate(remote);
     } else {
       const local = JSON.parse(localStorage.getItem('spiewnik_playlists') || '[]');
-      await setDoc(ref, { playlists: local, updatedAt: Date.now() });
+      await fbApi.setDoc(ref, { playlists: local, updatedAt: Date.now() });
     }
-    syncUnsub = onSnapshot(ref, (snap2) => {
+    syncUnsub = fbApi.onSnapshot(ref, (snap2) => {
       if(snap2.metadata.hasPendingWrites) return;
       const remote = (snap2.data() && snap2.data().playlists) || [];
       localStorage.setItem('spiewnik_playlists', JSON.stringify(remote));
@@ -607,9 +642,11 @@
     const code = getSyncCode();
     if(!code) return;
     try {
+      const ok = await loadFirebase();
+      if(!ok) return;
       await ensureAuth();
-      const ref = doc(fbDb, 'syncs', code);
-      await setDoc(ref, { playlists: list, updatedAt: Date.now() });
+      const ref = fbApi.doc(fbDb, 'syncs', code);
+      await fbApi.setDoc(ref, { playlists: list, updatedAt: Date.now() });
     } catch(e){ /* offline / blocked - local copy already saved, will retry on next change */ }
   }
 
@@ -6541,13 +6578,15 @@ Nie, nie lękam się i śpiewam chwały pieśń.` }
     viewerView.style.display = 'flex';
     viewerTitle.textContent = 'Wczytywanie…';
     try {
+      const ok = await loadFirebase();
+      if(!ok) throw new Error('Firebase niedostępny');
       await ensureAuth();
-      const ref = doc(fbDb, 'syncs', code);
-      const snap = await getDoc(ref);
+      const ref = fbApi.doc(fbDb, 'syncs', code);
+      const snap = await fbApi.getDoc(ref);
       const data = snap.exists() ? snap.data() : null;
       const playlists = (data && data.playlists) || [];
       renderViewerSongs(playlists.find(p => p.id === playlistId));
-      onSnapshot(ref, (snap2) => {
+      fbApi.onSnapshot(ref, (snap2) => {
         const d2 = snap2.exists() ? snap2.data() : null;
         const pls2 = (d2 && d2.playlists) || [];
         renderViewerSongs(pls2.find(p => p.id === playlistId));
@@ -6788,3 +6827,7 @@ Nie, nie lękam się i śpiewam chwały pieśń.` }
       reg.update();
     }).catch(()=>{});
   }
+})();
+</script>
+</body>
+</html>
