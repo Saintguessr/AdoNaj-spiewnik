@@ -5906,8 +5906,17 @@ Nie, nie lękam się i śpiewam chwały pieśń.` }
 
   function startAutoscroll(){
     if(autoscrollActive) return;
+    // Force layout to settle (in case the song view/panel just opened this
+    // same tick) before trusting clientHeight/scrollHeight - otherwise a fast
+    // click right after opening a song can read stale (equal) values and
+    // wrongly conclude there's nothing to scroll.
+    void songBodyWrap.offsetHeight;
     // Already at (or essentially at) the bottom - nothing to scroll to.
-    if(songBodyWrap.scrollTop + songBodyWrap.clientHeight >= songBodyWrap.scrollHeight - 1) return;
+    if(songBodyWrap.scrollTop + songBodyWrap.clientHeight >= songBodyWrap.scrollHeight - 1){
+      autoscrollPlayBtn.textContent = 'Nic do przewinięcia';
+      setTimeout(() => { if(!autoscrollActive) autoscrollPlayBtn.textContent = '▶ Start'; }, 1400);
+      return;
+    }
     autoscrollActive = true;
     autoscrollLastTs = null;
     autoscrollPos = songBodyWrap.scrollTop; // resync in case the person manually scrolled since the last pause
