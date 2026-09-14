@@ -1,6 +1,6 @@
 {
-  "name": "Śpiewnik AdoNaj",
-  "short_name": "Śpiewnik AdoNaj",
+  "name": "AdoNaj",
+  "short_name": "AdoNaj",
   "description": "Śpiewnik uwielbieniowy z akordami — wyszukiwarka pieśni po tytule",
   "start_url": "./index.html",
   "scope": "./",
