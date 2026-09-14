@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AdoNaj">
-<title>Śpiewnik AdoNaj</title>
+<title>AdoNaj</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-190.png">
 <link rel="apple-touch-icon" href="icons/icon-190.png">
@@ -340,6 +340,112 @@
     background:var(--card2); color:var(--text); font-size:16px; cursor:pointer; margin-right:4px;
   }
   .as-toggle-btn.active{color:var(--accent); border-color:var(--accent);}
+
+  /* ---------- Kalendarz: widget na ekranie głównym ---------- */
+  #calWidget{
+    padding:12px 16px; border-bottom:1px solid var(--border); background:var(--bg2);
+  }
+  #calOpenBtn{
+    background:none; border:none; color:var(--text); font-size:15px; font-weight:700;
+    padding:4px 0; cursor:pointer; display:flex; align-items:center; gap:6px;
+  }
+  #calOpenBtn::after{content:'›'; color:var(--muted); font-weight:400;}
+  #calUpcomingList{
+    display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    margin-top:10px; padding-bottom:2px;
+  }
+  #calUpcomingList:empty::after{
+    content:'Brak zaplanowanych wydarzeń'; color:var(--muted); font-size:13px;
+  }
+  .cal-pill{
+    flex-shrink:0; border-radius:12px; padding:8px 12px; min-width:120px;
+    font-size:12.5px; line-height:1.45; color:#1e1b0a; cursor:pointer; border:none;
+    text-align:left; font-family:inherit;
+  }
+  .cal-pill.wydarzenie{background:var(--accent);}
+  .cal-pill.proba{background:#7dd3fc;}
+  .cal-pill b{display:block; font-size:13.5px; margin-bottom:1px;}
+
+  /* ---------- Kalendarz: widok miesiąca ---------- */
+  #calendar-view{
+    position:fixed; inset:0; background:var(--bg); display:none; flex-direction:column; z-index:12;
+  }
+  #calendar-view.open{display:flex;}
+  .cal-nav{
+    display:flex; align-items:center; gap:8px; padding:10px 16px;
+  }
+  .cal-nav button{
+    background:var(--card2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:8px 14px; font-size:14px; cursor:pointer;
+  }
+  .cal-nav #calPrevBtn, .cal-nav #calNextBtn{padding:8px 16px; font-size:16px; font-weight:700;}
+  .cal-nav #calTodayBtn{flex:1; text-align:center; color:var(--accent); font-weight:700;}
+  .cal-weekdays{
+    display:grid; grid-template-columns:repeat(7,1fr); padding:0 16px;
+    color:var(--muted); font-size:12px; font-weight:700; text-align:center;
+  }
+  .cal-grid{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:8px 12px; flex:1; align-content:start;
+  }
+  .cal-day{
+    aspect-ratio:1; border-radius:10px; border:1px solid transparent; background:var(--card2);
+    color:var(--text); font-size:14px; cursor:pointer; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:3px; padding:2px;
+  }
+  .cal-day.other-month{background:none; color:var(--muted); opacity:.4; cursor:default;}
+  .cal-day.today{border-color:var(--accent); font-weight:700;}
+  .cal-day-dots{display:flex; gap:3px;}
+  .cal-dot{width:6px; height:6px; border-radius:50%; display:inline-block;}
+  .cal-dot-proba{background:#7dd3fc;}
+  .cal-dot-wydarzenie{background:var(--accent);}
+  .cal-legend{
+    display:flex; gap:18px; justify-content:center; padding:10px 16px calc(16px + var(--safe-bottom));
+    color:var(--muted); font-size:12.5px;
+  }
+  .cal-legend span{display:flex; align-items:center; gap:6px;}
+
+  /* ---------- Kalendarz: arkusz dnia (dodawanie/edycja wydarzeń) ---------- */
+  #calDaySheetBackdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; z-index:21;
+    align-items:flex-end; justify-content:center;
+  }
+  #calDaySheetBackdrop.open{display:flex;}
+  #calDaySheet{
+    width:100%; max-width:480px; background:var(--bg2); border-radius:16px 16px 0 0;
+    border:1px solid var(--border); border-bottom:none;
+    padding:16px 16px calc(16px + var(--safe-bottom)); max-height:85vh; overflow-y:auto;
+  }
+  .cal-day-sheet-header{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
+  }
+  .cal-day-sheet-header span{font-size:16px; font-weight:700; text-transform:capitalize;}
+  #calDayEventsList{margin-bottom:6px;}
+  .cal-day-event-item{
+    display:flex; align-items:center; gap:10px; padding:10px 10px; border-radius:10px;
+    background:var(--card2); margin-bottom:8px;
+  }
+  .cal-day-event-item .cal-dot{width:10px; height:10px; flex-shrink:0;}
+  .cal-day-event-item .cal-ev-info{flex:1; min-width:0; font-size:13.5px; line-height:1.4;}
+  .cal-day-event-item .cal-ev-info b{display:block; font-size:14.5px;}
+  .cal-day-event-item .cal-ev-info .muted{color:var(--muted);}
+  .cal-day-event-item button{
+    background:none; border:none; color:#f87171; font-size:17px; cursor:pointer; padding:6px;
+  }
+  .cal-day-form{margin-top:10px; padding-top:12px; border-top:1px solid var(--border);}
+  .cal-type-toggle{display:flex; gap:8px; margin-bottom:10px;}
+  .cal-type-btn{
+    flex:1; padding:10px; border-radius:10px; border:1px solid var(--border);
+    background:var(--card2); color:var(--text); font-size:14px; font-weight:700; cursor:pointer;
+  }
+  .cal-type-btn.cal-type-proba.active{background:#7dd3fc; color:#0c2a3a; border-color:#7dd3fc;}
+  .cal-type-btn.cal-type-wydarzenie.active{background:var(--accent); color:#1e1b0a; border-color:var(--accent);}
+  .cal-input{
+    width:100%; padding:11px 12px; border-radius:10px; border:1px solid var(--border);
+    background:var(--card2); color:var(--text); font-size:15px; outline:none; margin-bottom:10px; box-sizing:border-box;
+  }
+  .cal-input:focus{border-color:var(--accent);}
+  .cal-form-row{display:flex; gap:10px;}
+  .cal-form-row .cal-input{flex:1; min-width:0;}
 </style>
 </head>
 <body>
@@ -366,7 +472,7 @@
 
   <div id="list-view">
     <header>
-      <h1><span class="dot"><img src="icons/icon-192.png" alt="" style="height: 30px; vertical-align: middle;"></span> Śpiewnik AdoNaj</h1>
+      <h1><span class="dot"><img src="icons/icon-192.png" alt="" style="height: 30px; vertical-align: middle;"></span>AdoNaj - Adorujmy Najwyższego</h1>
       <div class="tabs">
         <button class="tab-btn active" id="tabSongs" data-tab="songs">Pieśni</button>
         <button class="tab-btn" id="tabPlaylists" data-tab="playlists">Setlisty</button>
@@ -379,6 +485,10 @@
         <div class="count" id="count"></div>
       </div>
     </header>
+    <div id="calWidget">
+      <button id="calOpenBtn">📅 Kalendarz</button>
+      <div id="calUpcomingList"></div>
+    </div>
     <div id="songsPane">
       <div id="listContainer"></div>
     </div>
@@ -393,7 +503,7 @@
 
   <div id="viewer-view" style="display:none; flex-direction:column; height:100%;">
     <header>
-      <h1><span class="dot"><img src="icons/icon-192.png" alt="" style="height: 30px; vertical-align: middle;"></span> Śpiewnik AdoNaj</h1>
+      <h1><span class="dot"><img src="icons/icon-192.png" alt="" style="height: 30px; vertical-align: middle;"></span>AdoNaj - Adorujmy Najwyższego</h1>
       <div class="count">🔒 Udostępniona setlista - tylko do odczytu</div>
     </header>
     <div class="detail-header" style="background:transparent; border-bottom:1px solid var(--border);">
@@ -457,6 +567,48 @@
       <ul class="quick-pl-list" id="quickAddList"></ul>
       <div class="quick-new-row">
         <button id="quickAddNewBtn">+ Nowa setlista z tą pieśnią</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="calendar-view">
+    <div class="detail-header">
+      <button class="back-btn" id="calBackBtn">‹ Wróć</button>
+      <div class="detail-title" id="calMonthTitle"></div>
+    </div>
+    <div class="cal-nav">
+      <button id="calPrevBtn" aria-label="Poprzedni miesiąc">‹</button>
+      <button id="calTodayBtn">Dziś</button>
+      <button id="calNextBtn" aria-label="Następny miesiąc">›</button>
+    </div>
+    <div class="cal-weekdays">
+      <span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span>
+    </div>
+    <div id="calGrid" class="cal-grid"></div>
+    <div class="cal-legend">
+      <span><i class="cal-dot cal-dot-proba"></i> Próba</span>
+      <span><i class="cal-dot cal-dot-wydarzenie"></i> Wydarzenie</span>
+    </div>
+  </div>
+
+  <div id="calDaySheetBackdrop">
+    <div id="calDaySheet">
+      <div class="cal-day-sheet-header">
+        <span id="calDaySheetTitle"></span>
+        <button id="calDaySheetCloseBtn" class="pld-icon-btn" title="Zamknij">×</button>
+      </div>
+      <div id="calDayEventsList"></div>
+      <div class="cal-day-form">
+        <div class="cal-type-toggle">
+          <button type="button" class="cal-type-btn cal-type-proba active" id="calTypeProbaBtn">Próba</button>
+          <button type="button" class="cal-type-btn cal-type-wydarzenie" id="calTypeWydarzenieBtn">Wydarzenie</button>
+        </div>
+        <input id="calEventName" class="cal-input" type="text" placeholder="Nazwa wydarzenia" style="display:none;" autocomplete="off">
+        <div class="cal-form-row">
+          <input id="calEventTime" class="cal-input" type="time" placeholder="Godzina">
+          <input id="calEventPlace" class="cal-input" type="text" placeholder="Miejsce" autocomplete="off">
+        </div>
+        <button id="calEventSaveBtn" class="pld-add-btn">+ Dodaj</button>
       </div>
     </div>
   </div>
@@ -6812,6 +6964,235 @@ Nie, nie lękam się i śpiewam chwały pieśń.` }
       metPlayClick(ctx.currentTime + 0.02, false);
     }
   });
+
+  // ---------- Kalendarz wydarzeń/prób ----------
+  const CAL_EVENTS_KEY = 'adonaj_calendar_events_v1';
+  function getCalEvents(){
+    try { return JSON.parse(localStorage.getItem(CAL_EVENTS_KEY) || '[]'); } catch(e){ return []; }
+  }
+  function saveCalEvents(list){
+    try { localStorage.setItem(CAL_EVENTS_KEY, JSON.stringify(list)); } catch(e){ /* not fatal */ }
+  }
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function calDateKey(y, m, d){ return y + '-' + pad2(m+1) + '-' + pad2(d); } // m is 0-indexed
+  function calTodayKey(){
+    const t = new Date();
+    return calDateKey(t.getFullYear(), t.getMonth(), t.getDate());
+  }
+  const CAL_MONTH_SHORT = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
+  const CAL_MONTH_FULL = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+  const CAL_WEEKDAY_FULL = ['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'];
+
+  const calOpenBtn = document.getElementById('calOpenBtn');
+  const calUpcomingList = document.getElementById('calUpcomingList');
+  const calendarView = document.getElementById('calendar-view');
+  const calBackBtn = document.getElementById('calBackBtn');
+  const calMonthTitle = document.getElementById('calMonthTitle');
+  const calPrevBtn = document.getElementById('calPrevBtn');
+  const calNextBtn = document.getElementById('calNextBtn');
+  const calTodayBtn = document.getElementById('calTodayBtn');
+  const calGrid = document.getElementById('calGrid');
+  const calDaySheetBackdrop = document.getElementById('calDaySheetBackdrop');
+  const calDaySheetTitle = document.getElementById('calDaySheetTitle');
+  const calDaySheetCloseBtn = document.getElementById('calDaySheetCloseBtn');
+  const calDayEventsList = document.getElementById('calDayEventsList');
+  const calTypeProbaBtn = document.getElementById('calTypeProbaBtn');
+  const calTypeWydarzenieBtn = document.getElementById('calTypeWydarzenieBtn');
+  const calEventName = document.getElementById('calEventName');
+  const calEventTime = document.getElementById('calEventTime');
+  const calEventPlace = document.getElementById('calEventPlace');
+  const calEventSaveBtn = document.getElementById('calEventSaveBtn');
+
+  let calViewYear, calViewMonth; // month is 0-indexed
+  let calSelectedDate = null; // 'YYYY-MM-DD' of the day sheet currently open
+  let calSelectedType = 'proba'; // 'proba' | 'wydarzenie'
+
+  function renderCalUpcoming(){
+    const today = calTodayKey();
+    const events = getCalEvents()
+      .filter(ev => ev.date >= today)
+      .sort((a,b) => (a.date + (a.time||'')).localeCompare(b.date + (b.time||'')))
+      .slice(0, 8);
+    if(!events.length){ calUpcomingList.innerHTML = ''; return; }
+    calUpcomingList.innerHTML = events.map(ev => {
+      const [y,m,d] = ev.date.split('-').map(n => parseInt(n,10));
+      const label = d + ' ' + CAL_MONTH_SHORT[m-1] + (ev.time ? ', ' + ev.time : '');
+      const placeStr = ev.place ? ' · ' + escapeHtml(ev.place) : '';
+      return '<button class="cal-pill ' + ev.type + '" data-date="' + ev.date + '">' +
+        '<b>' + escapeHtml(ev.name) + '</b>' + label + placeStr + '</button>';
+    }).join('');
+  }
+
+  function renderCalMonth(){
+    calMonthTitle.textContent = CAL_MONTH_FULL[calViewMonth] + ' ' + calViewYear;
+    const events = getCalEvents();
+    const eventsByDate = {};
+    events.forEach(ev => { (eventsByDate[ev.date] = eventsByDate[ev.date] || []).push(ev); });
+
+    const firstOfMonth = new Date(calViewYear, calViewMonth, 1);
+    // JS getDay(): 0=Sun..6=Sat. We display a Monday-first week, so shift accordingly.
+    const leadingBlanks = (firstOfMonth.getDay() + 6) % 7;
+    const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+    const daysInPrevMonth = new Date(calViewYear, calViewMonth, 0).getDate();
+    const today = calTodayKey();
+
+    let html = '';
+    for(let i = leadingBlanks; i > 0; i--){
+      html += '<div class="cal-day other-month">' + (daysInPrevMonth - i + 1) + '</div>';
+    }
+    for(let d = 1; d <= daysInMonth; d++){
+      const key = calDateKey(calViewYear, calViewMonth, d);
+      const dayEvents = eventsByDate[key] || [];
+      const hasProba = dayEvents.some(e => e.type === 'proba');
+      const hasWydarzenie = dayEvents.some(e => e.type === 'wydarzenie');
+      let dots = '';
+      if(hasProba || hasWydarzenie){
+        dots = '<div class="cal-day-dots">' +
+          (hasProba ? '<span class="cal-dot cal-dot-proba"></span>' : '') +
+          (hasWydarzenie ? '<span class="cal-dot cal-dot-wydarzenie"></span>' : '') +
+          '</div>';
+      }
+      html += '<button class="cal-day' + (key === today ? ' today' : '') + '" data-date="' + key + '">' +
+        d + dots + '</button>';
+    }
+    const trailingBlanks = (7 - ((leadingBlanks + daysInMonth) % 7)) % 7;
+    for(let d = 1; d <= trailingBlanks; d++){
+      html += '<div class="cal-day other-month">' + d + '</div>';
+    }
+    calGrid.innerHTML = html;
+  }
+
+  function openCalendarMonth(year, month){
+    calViewYear = year;
+    calViewMonth = month;
+    renderCalMonth();
+    openOverlay(calendarView);
+  }
+
+  calOpenBtn.addEventListener('click', () => {
+    const t = new Date();
+    openCalendarMonth(t.getFullYear(), t.getMonth());
+  });
+  calBackBtn.addEventListener('click', goBack);
+  calPrevBtn.addEventListener('click', () => {
+    calViewMonth--;
+    if(calViewMonth < 0){ calViewMonth = 11; calViewYear--; }
+    renderCalMonth();
+  });
+  calNextBtn.addEventListener('click', () => {
+    calViewMonth++;
+    if(calViewMonth > 11){ calViewMonth = 0; calViewYear++; }
+    renderCalMonth();
+  });
+  calTodayBtn.addEventListener('click', () => {
+    const t = new Date();
+    calViewYear = t.getFullYear();
+    calViewMonth = t.getMonth();
+    renderCalMonth();
+  });
+  // Swipe left/right between months, in addition to the ‹ › buttons.
+  let calTouchStartX = null;
+  calGrid.addEventListener('touchstart', e => { calTouchStartX = e.touches[0].clientX; }, { passive:true });
+  calGrid.addEventListener('touchend', e => {
+    if(calTouchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - calTouchStartX;
+    calTouchStartX = null;
+    if(Math.abs(dx) < 50) return;
+    if(dx < 0) calNextBtn.click(); else calPrevBtn.click();
+  }, { passive:true });
+
+  function setCalType(type){
+    calSelectedType = type;
+    calTypeProbaBtn.classList.toggle('active', type === 'proba');
+    calTypeWydarzenieBtn.classList.toggle('active', type === 'wydarzenie');
+    calEventName.style.display = (type === 'wydarzenie') ? '' : 'none';
+  }
+  calTypeProbaBtn.addEventListener('click', () => setCalType('proba'));
+  calTypeWydarzenieBtn.addEventListener('click', () => setCalType('wydarzenie'));
+
+  function renderCalDayEventsList(){
+    const dayEvents = getCalEvents()
+      .filter(ev => ev.date === calSelectedDate)
+      .sort((a,b) => (a.time||'').localeCompare(b.time||''));
+    if(!dayEvents.length){ calDayEventsList.innerHTML = ''; return; }
+    calDayEventsList.innerHTML = dayEvents.map(ev => {
+      const details = [ev.time, ev.place].filter(Boolean).join(' · ');
+      return '<div class="cal-day-event-item" data-id="' + ev.id + '">' +
+        '<span class="cal-dot cal-dot-' + ev.type + '"></span>' +
+        '<div class="cal-ev-info"><b>' + escapeHtml(ev.name) + '</b>' +
+        (details ? '<span class="muted">' + escapeHtml(details) + '</span>' : '') + '</div>' +
+        '<button class="cal-del-btn" title="Usuń">🗑</button></div>';
+    }).join('');
+  }
+
+  function openDaySheet(dateKey){
+    calSelectedDate = dateKey;
+    const d = new Date(dateKey + 'T00:00:00');
+    calDaySheetTitle.textContent = d.getDate() + ' ' + CAL_MONTH_FULL[d.getMonth()].toLowerCase() + ' (' + CAL_WEEKDAY_FULL[d.getDay()] + ')';
+    renderCalDayEventsList();
+    setCalType('proba');
+    calEventName.value = '';
+    calEventTime.value = '';
+    calEventPlace.value = '';
+    openOverlay(calDaySheetBackdrop);
+  }
+
+  calGrid.addEventListener('click', e => {
+    const btn = e.target.closest('button.cal-day');
+    if(btn) openDaySheet(btn.dataset.date);
+  });
+  calUpcomingList.addEventListener('click', e => {
+    const btn = e.target.closest('button.cal-pill');
+    if(!btn) return;
+    const [y,m] = btn.dataset.date.split('-').map(n => parseInt(n,10));
+    openCalendarMonth(y, m - 1);
+    // Give the month view a tick to render before opening the day on top of it.
+    setTimeout(() => openDaySheet(btn.dataset.date), 0);
+  });
+
+  calDaySheetCloseBtn.addEventListener('click', goBack);
+  calDaySheetBackdrop.addEventListener('click', e => {
+    if(e.target === calDaySheetBackdrop) goBack();
+  });
+
+  calEventSaveBtn.addEventListener('click', () => {
+    const name = calSelectedType === 'wydarzenie'
+      ? (calEventName.value.trim() || 'Wydarzenie')
+      : 'Próba';
+    const ev = {
+      id: 'ev_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      date: calSelectedDate,
+      type: calSelectedType,
+      name,
+      time: calEventTime.value || '',
+      place: calEventPlace.value.trim()
+    };
+    const list = getCalEvents();
+    list.push(ev);
+    saveCalEvents(list);
+    renderCalDayEventsList();
+    renderCalMonth();
+    renderCalUpcoming();
+    setCalType('proba');
+    calEventName.value = '';
+    calEventTime.value = '';
+    calEventPlace.value = '';
+  });
+
+  calDayEventsList.addEventListener('click', async e => {
+    const delBtn = e.target.closest('button.cal-del-btn');
+    if(!delBtn) return;
+    const id = delBtn.closest('.cal-day-event-item').dataset.id;
+    const ok = await customConfirm('Usunąć to wydarzenie?');
+    if(!ok) return;
+    saveCalEvents(getCalEvents().filter(ev => ev.id !== id));
+    renderCalDayEventsList();
+    renderCalMonth();
+    renderCalUpcoming();
+  });
+
+  renderCalUpcoming();
 
   const urlParams = new URLSearchParams(location.search);
   const shareCode = urlParams.get('view');
