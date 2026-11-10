@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#1e293b"> 
+<meta name="theme-color" content="#1e293b">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -40,7 +40,17 @@
     margin:0 0 10px; font-size:20px; font-weight:700; letter-spacing:.2px;
     display:flex; align-items:center; gap:8px;
   }
-  header h1 .dot{color:var(--accent);}
+  header h1 .dot{color:var(--accent); display: inline-flex; align-items:center;}
+  header h1 .header-insta {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  header h1 .header-insta:hover {
+    color: var(--accent);
+  }
   .search-wrap{position:relative;}
   #search{
     width:100%; padding:11px 38px 11px 14px; border-radius:12px; border:1px solid var(--border);
@@ -110,15 +120,6 @@
   .pl-del:active{color:#f87171;}
 
   /* ---------- Detail view ---------- */
-  /* z-index:15 (not 10) and NOT conditional on .open - this must always
-     render above playlist-detail-view/playlist-picker-view (z-index 10/11)
-     because a song can be opened FROM WITHIN a setlist, in which case both
-     overlays are simultaneously marked "open" and this one needs to win
-     the stacking order. A past bug here: this used to sit at the SAME
-     z-index as the (closed) base state and never got bumped when opened,
-     so the song view was 100% functionally open (correct DOM state) but
-     invisible underneath the still-open setlist view. Keep this above
-     10/11 if you ever add more overlay layers. */
   #detail-view{
     position:fixed; inset:0; background:var(--bg); display:none; flex-direction:column; z-index:15;
   }
@@ -149,8 +150,6 @@
     font-size:15px; line-height:1.55; white-space:pre; overflow-x:auto;
     tab-size:4; -moz-tab-size:4;
   }
-  /* chord-looking tokens (heuristic highlight) are wrapped server-side via span.chordline is not used;
-     instead we color whole lines that look chord-only using a class added by JS */
   .chord-line{color:var(--chord); font-weight:700;}
   .ref-line{color:#38bdf8;}
 
@@ -241,8 +240,7 @@
     background:none; color:var(--accent); font-size:14px; font-weight:700; cursor:pointer; width:100%;
   }
 
-  /* ---------- Custom dialog (replaces native prompt/confirm/alert, which
-     are unreliable inside an installed/standalone PWA on many phones) ---------- */
+  /* ---------- Custom dialog ---------- */
   #customDialogBackdrop{
     position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; z-index:30;
     align-items:center; justify-content:center; padding:20px;
@@ -292,7 +290,14 @@
 
   <div id="list-view">
     <header>
-      <h1><span class="dot"><img src="icons/icon-192.png" alt="" style="height: 30px; vertical-align: middle;"></span> Śpiewnik AdoNaj</h1>
+      <h1>
+        <span class="dot"><img src="icons/icon-192.png" alt="" style="height: 30px; vertical-align: middle;"></span> Śpiewnik AdoNaj
+        <a href="https://www.instagram.com/adonaj_adorujmy_najwyzszego/" target="_blank" rel="noopener noreferrer" class="header-insta" title="Instagram AdoNaj">
+          <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+        </a>
+      </h1>
       <div class="tabs">
         <button class="tab-btn active" id="tabSongs" data-tab="songs">Pieśni</button>
         <button class="tab-btn" id="tabPlaylists" data-tab="playlists">Setlisty</button>
@@ -399,7 +404,6 @@
 </div>
 
 <script type="module">
-  // ---------- Firebase (cross-device setlist sync) ----------
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
   import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
@@ -455,7 +459,7 @@
       const remote = (snap2.data() && snap2.data().playlists) || [];
       localStorage.setItem('spiewnik_playlists', JSON.stringify(remote));
       onRemoteUpdate(remote);
-    }, () => { /* connection error - ignore, local copy remains authoritative */ });
+    }, () => {});
   }
 
   function disconnectSync(){
@@ -470,10 +474,9 @@
       await ensureAuth();
       const ref = doc(fbDb, 'syncs', code);
       await setDoc(ref, { playlists: list, updatedAt: Date.now() });
-    } catch(e){ /* offline / blocked - local copy already saved, will retry on next change */ }
+    } catch(e){}
   }
 
-  // ---------- Main app ----------
 (async function(){
   function parseSongsText(text){
     const TITLE_MARK = '%%%TITLE%%%';
@@ -594,12 +597,6 @@
     listContainer.innerHTML = html;
   }
 
-  // Heuristic: a line is a "chord line" if, once split on whitespace, every
-  // token looks like a chord symbol. Supports both major (uppercase root,
-  // e.g. G, C7, D/Fis) and Polish minor notation (lowercase root, e.g.
-  // a, h, fis, cis, gis, dis, ais - the h/is/es forms used for minor chords
-  // and sharps/flats in Polish chord charts), plus slash chords, sus/maj/
-  // min/dim/aug/add qualifiers and numeric extensions (7, 9, sus4...).
   const CHORD_TOKEN = /^\(?(?:[A-H]|[a-h])(?:is|es|s)?(?:sus|maj|min|dim|aug|add|m)?[0-9]*[\+\-]?(?:\/(?:(?:[A-H]|[a-h])(?:is|es|s)?[0-9]*)?)?\)?$/;
   function isChordLine(line){
     const trimmed = line.trim();
@@ -614,9 +611,6 @@
     return /^\s*(Ref\.?|Refren|REFREN|Bridge|BRIDGE|Coda)\b/i.test(line);
   }
 
-  // ---------- Overlay stack: keeps every full-screen view / sheet in sync
-  // with browser history so the hardware/software back button always closes
-  // exactly the thing currently on top, however deep the user navigated. ----------
   const overlayStack = [];
   function openOverlay(el){
     el.classList.add('open');
@@ -644,12 +638,6 @@
   });
   function goBack(){ history.back(); }
 
-  // ---------- Custom dialog: replaces window.prompt/confirm/alert. Native
-  // dialogs are unreliable inside an installed/standalone PWA on many
-  // phones (can silently fail or freeze script execution), so every user
-  // interaction that used to rely on them now goes through this instead -
-  // it's a normal DOM overlay, fully integrated with the same back-button
-  // stack as every other screen. ----------
   function showDialog(opts){
     return new Promise((resolve) => {
       dialogResolve = resolve;
@@ -692,7 +680,6 @@
     if(e.key === 'Enter'){ dialogPendingResult = customDialogInput.value; goBack(); }
   });
 
-  // ---------- Song reading view ----------
   let currentSongIdx = null;
   function openSong(idx){
     currentSongIdx = idx;
@@ -742,7 +729,6 @@
   fontPlus.addEventListener('click', () => { fontSize = Math.min(26, fontSize+1); applyFont(); });
   applyFont();
 
-  // ---------- Tabs: Pieśni / Setlisty ----------
   tabSongs.addEventListener('click', () => {
     tabSongs.classList.add('active'); tabPlaylists.classList.remove('active');
     songsPane.style.display = ''; playlistsPane.style.display = 'none';
@@ -755,7 +741,6 @@
     renderPlaylists();
   });
 
-  // ---------- Playlists (setlisty) data layer ----------
   function loadPlaylists(){
     try {
       const raw = localStorage.getItem('spiewnik_playlists');
@@ -811,7 +796,6 @@
     openPlaylistDetail(pl.id);
   });
 
-  // ---------- Sync UI ----------
   function refreshSyncStatus(tempText){
     const code = getSyncCode();
     if(tempText){
@@ -883,7 +867,6 @@
     if(openBtn) openPlaylistDetail(openBtn.dataset.id);
   });
 
-  // ---------- Playlist detail (setlist contents, reorder, remove) ----------
   let currentPlaylistId = null;
 
   function openPlaylistDetail(id){
@@ -984,7 +967,7 @@
     }
     const url = location.origin + location.pathname + '?view=' + encodeURIComponent(code) + '&pl=' + encodeURIComponent(currentPlaylistId);
     let copied = false;
-    try { await navigator.clipboard.writeText(url); copied = true; } catch(e){ /* clipboard permission denied or unsupported - link is still shown below to copy manually */ }
+    try { await navigator.clipboard.writeText(url); copied = true; } catch(e){}
     await customPrompt((copied ? 'Link skopiowany do schowka!' : 'Skopiuj poniższy link ręcznie:') + '\nKażdy, kto go otworzy, zobaczy tę setlistę bez możliwości edycji.', url);
   });
 
@@ -992,7 +975,6 @@
     openPicker();
   });
 
-  // ---------- Picker: search + toggle songs into the current setlist ----------
   function renderPicker(filterText){
     const pl = getPlaylist(currentPlaylistId);
     if(!pl) return;
@@ -1046,7 +1028,6 @@
   });
   pickerBackBtn.addEventListener('click', goBack);
 
-  // ---------- Quick "add current song to a setlist" sheet (from reading view) ----------
   function renderQuickAdd(){
     if(currentSongIdx === null) return;
     const title = SONGS[currentSongIdx].title;
@@ -1097,13 +1078,6 @@
     renderQuickAdd();
   });
 
-  // ---------- Read-only shared setlist viewer ----------
-  // Reached via a link like index.html?view=SYNCCODE&pl=PLAYLISTID (built
-  // by the 🔗 share button in a setlist's own header). Whoever opens this
-  // link sees that one setlist live from the cloud - browsable, tap a
-  // title to read its lyrics (via the exact same read-only lyrics screen
-  // everyone uses) - but with none of the edit/create/reorder/delete UI,
-  // since it never touches localStorage or savePlaylists() at all.
   function renderViewerSongs(pl){
     if(!pl){
       viewerTitle.textContent = 'Nie znaleziono setlisty';
@@ -1148,7 +1122,7 @@
         const d2 = snap2.exists() ? snap2.data() : null;
         const pls2 = (d2 && d2.playlists) || [];
         renderViewerSongs(pls2.find(p => p.id === playlistId));
-      }, () => { /* connection error - keep showing the last known state */ });
+      }, () => {});
     } catch(e){
       viewerTitle.textContent = 'Błąd wczytywania';
       viewerSongsContainer.innerHTML = '<div class="empty">Nie udało się połączyć z internetem. Spróbuj odświeżyć stronę.</div>';
@@ -1165,14 +1139,6 @@
   }
 
   if('serviceWorker' in navigator){
-    // Auto-update: force an immediate update check every time the app
-    // loads (rather than waiting for the browser's own, much lazier
-    // periodic check), and reload the page exactly once whenever a newly
-    // activated service worker takes control - this is what actually
-    // guarantees the freshest index.html is used without anyone needing
-    // to manually clear cache/cookies. skipWaiting()+clients.claim() in
-    // the service worker make the new one take control right away; this
-    // just makes sure the already-open page picks it up immediately too.
     let refreshedOnce = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if(refreshedOnce) return;
